@@ -15,6 +15,7 @@ module.exports = app => {
         const cards = await Card.find({})
         res.send(cards)
     })
+    // Create a card in the database
     app.post("/api/cards", async (req, res) => {
         
         try {
@@ -27,29 +28,42 @@ module.exports = app => {
             res.status(400).send(err)
         }
     })
+    // Edit the card
     app.put("/api/cards", async (req, res) => {
+        // I don't know whether I can use "_id" in url params instead of name of card?
         const {name, status, content, category, author} = req.body
+        
         try {
             const card = await Card.findOne({name})
             console.log("Card info")
             console.log(card)
-
+            console.log(author, card.author)
             if (check_user(author, card.author)) {
-                card.name = name
-                card.content = content
-                card.category = category
-                card.status = status
+                if (name) {
+                    card.name = name
+                }
+                if (content) {
+                    card.content = content
+                }
+                if (category) {
+                    card.category = category
+                }
+                if (status) {
+                    card.status = status
+                }
                 await card.save()
 
                 const message = "Update a card successfully!"
-                res.send(card)
+                res.send(message)
             }
             res.send("You are not authorized to edit this card")
         } catch (err) {
             console.log(err)
         }
     })
+    // Delete the card
     app.delete("/api/cards", async (req, res) => {
+        // I don't know whether I can use "_id" in url params instead of name of card?
         const {name, author} = req.body
         try {
             const card = await Card.findOne({name})
